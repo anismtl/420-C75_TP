@@ -1,0 +1,30 @@
+name: Import BankSim dataset
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download and unzip BankSim from Kaggle
+        run: |
+          curl -L -o /tmp/banksim1.zip "https://www.kaggle.com/api/v1/datasets/download/ealaxi/banksim1"
+          unzip -o /tmp/banksim1.zip -d data/
+          rm -f data/banksim1.zip
+          ls -lh data/
+
+      - name: Commit uncompressed CSV files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git status --short
+          git commit -m "Add BankSim CSV files (uncompressed)" || echo "Nothing to commit"
+          git push
